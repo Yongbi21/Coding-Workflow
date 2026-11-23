@@ -57,18 +57,19 @@ By default, `AGENTS.md` enforces **Manual Implementation Control**:
 - **Mandatory `A–D` format:** Every proposed change includes **A** (What to change), **B** (Where), **C** (Exact minimal syntax reference), and **D** (Step-by-step manual instructions), ending with `"Confirm if this syntax is correct before applying changes."`
 - **Best for:** Existing or legacy codebases, bug fixes, risky logic, and staying in full control of every line you commit.
 
-### Draft Mode (Opt-In, One Task Only)
+### Draft Mode (Opt-In)
 
-Say **`draft mode`** when you want complete code output for a specific task:
-- **What changes:** The fragment-only limit is lifted for **that task only** — the AI can output full functions, classes, boilerplate, or unit tests in chat.
+Say **`draft mode`** anywhere in your prompt (no strict syntax required) when you want complete code output:
+- **What changes:** The fragment-only limit is lifted — the AI can output full functions, classes, boilerplate, or unit tests in chat.
 - **What stays the same:** Analysis, task sizing (`Small`/`Medium`/`Large`), risk floor, security rules, warnings, and the confirmation line all still apply. The AI **still does not edit your source files directly**; the output is a draft for you to review and apply.
-- **Auto-reset:** Draft Mode ends automatically when the task finishes and reverts to Default Mode on the next task.
+- **Single-task default (auto-reset):** Saying `draft mode` applies to **that task only** and automatically reverts to Default Mode on the next task.
+- **Extended session override:** If you want Draft Mode to stay active across multiple tasks (e.g., scaffolding several files in one session), explicitly say **`keep draft mode on for this session until I say normal/default mode`** (covered by Rule 7: human decision wins). It stays on until you switch back and resets in a new session. *(In very long chats or after context compaction, give a quick reminder if the AI reverts.)*
 - **Best for:** Repetitive boilerplate, test suites, scaffolds, or new standalone scripts.
 
 | Behavior | Default Mode | Draft Mode |
 | --- | --- | --- |
-| Activation | Automatic | Say `draft mode` |
-| Duration | Every task | Single task only (auto-resets) |
+| Activation | Automatic | Say `draft mode` (or `keep draft mode on` for a session) |
+| Duration | Every task | Single task by default (auto-resets), or until you say `normal`/`default mode` |
 | Code output | Minimal fragments & `old -> new` snippets | Full functions, classes, boilerplate, tests |
 | AI edits source files? | No | No (review & apply manually) |
 | Sizing, risk floor & security rules | Enforced | Enforced |
