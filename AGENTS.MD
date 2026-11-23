@@ -1,4 +1,4 @@
-# AGENTS.md
+# AGENTS.MD
 
 ## Purpose
 
@@ -115,7 +115,7 @@ Classify by the HIGHEST level any criterion hits, and state it in one line.
 * Medium: 2-4 files, or a few callers, or a query/logic change.
   -> Impact note (max 5 lines), then A-D.
 * Large: 5+ files, shared/many-caller code, schema or stored procedure change, new module, or migration.
-  -> Read LARGE-CHANGES.md and run the phases it defines.
+  -> Read LARGE-CHANGES.MD and run the phases it defines.
 * Risk floor: anything in the map's "High-risk areas" section, or any code involving money/financial calculations, authentication or permissions, personal data, shared code with many callers, data migrations, or irreversible/destructive operations, is at least Medium.
 * To find callers, grep for the symbol (and for DB objects, grep the SQL text too). Do not guess.
 * For bugs, features, optimizations, tests, edge cases, and data fixes, investigate first and classify after (see section 2).
@@ -198,7 +198,7 @@ Classify by the HIGHEST level any criterion hits, and state it in one line.
 * When the user says "handoff", output the session state using the template below.
   Pull from the whole session, not just the last turn. Write "none" for empty
   fields. Facts and decisions only, no code. Do not write any file.
-* If HANDOFF.md exists at session start, treat it as a claim, not a fact:
+* If HANDOFF.MD exists at session start, treat it as a claim, not a fact:
   re-read the code it names before giving syntax, and treat Lacking and
   Assumptions as open.
 ### 6A. Template
