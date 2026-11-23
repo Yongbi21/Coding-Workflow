@@ -70,20 +70,25 @@
     $rootDir     = (Get-Location).ProviderPath                                                                                                                                                              
     $excludeDirs = @(".git", ".vs", "bin", "obj", "node_modules", "packages")                                                                                                                               
                                                                                                                                                                                                             
+    $projExts = @(".csproj", ".vbproj", ".fsproj")                                                                                                                                                          
     $csprojFiles = @(                                                                                                                                                                                       
-        Get-ChildItem -LiteralPath $rootDir -Filter "*.csproj" -File -ErrorAction SilentlyContinue                                                                                                          
+        Get-ChildItem -LiteralPath $rootDir -File -ErrorAction SilentlyContinue |                                                                                                                           
+            Where-Object { $_.Extension -in $projExts }                                                                                                                                                     
         Get-ChildItem -LiteralPath $rootDir -Directory -ErrorAction SilentlyContinue |                                                                                                                      
             Where-Object { $_.Name -notin $excludeDirs } |                                                                                                                                                  
-            ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Filter "*.csproj" -File -ErrorAction SilentlyContinue }                                                                                
+            ForEach-Object {                                                                                                                                                                                
+                Get-ChildItem -LiteralPath $_.FullName -File -ErrorAction SilentlyContinue |                                                                                                                
+                    Where-Object { $_.Extension -in $projExts }                                                                                                                                             
+            }                                                                                                                                                                                               
     )                                                                                                                                                                                                       
-                                                                                                                                                                                                            
+
     $installBase    = $rootDir                                                                                                                                                                              
     $selectedCsproj = $null                                                                                                                                                                                 
                                                                                                                                                                                                             
     if ($csprojFiles.Count -gt 0) {                                                                                                                                                                         
         $choice = Select-MenuOption -Title "Where should docs\Coding-Workflow be installed?" -Options @(                                                                                                    
             "Solution / Root level",                                                                                                                                                                        
-            "Project level (.csproj)"                                                                                                                                                                       
+            "Project level (.csproj / .vbproj / .fsproj)"                                                                                                                                                                      
         )                                                                                                                                                                                                   
                                                                                                                                                                                                             
         if ($choice -lt 0) {                                                                                                                                                                                
@@ -201,7 +206,7 @@
             Write-Host "Added $added workflow file(s) to: $($selectedCsproj.Name)" -ForegroundColor Green                                                                                                   
         }                                                                                                                                                                                                   
         else {                                                                                                                                                                                              
-            Write-Host "Skipped .csproj update (files already included in $($selectedCsproj.Name))." -ForegroundColor Yellow                                                                                
+            Write-Host "Skipped project file update (files already included in $($selectedCsproj.Name))." -ForegroundColor Yellow                                                                                
         }                                                                                                                                                                                                   
     }                                                                                                                                                                                                       
     else {                                                                                                                                                                                                  
