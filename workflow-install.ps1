@@ -31,3 +31,34 @@ foreach ($file in $files) {
 
 }
 
+    $rootDir  = (Get-Location).ProviderPath                                                                                                                                                                 
+    $slnFiles = @(Get-ChildItem -LiteralPath $rootDir -Filter "*.sln" -File)                                                                                                                                
+                                                                                                                                                                                                            
+    if ($slnFiles.Count -eq 1) {                                                                                                                                                                            
+        $slnPath = $slnFiles[0].FullName                                                                                                                                                                    
+        $content = Get-Content -LiteralPath $slnPath -Raw                                                                                                                                                   
+        if ($content -match '"Coding-Workflow"') {                                                                                                                                                          
+            Write-Host "Skipped .sln update (already contains Coding-Workflow)." -ForegroundColor Yellow                                                                                                    
+            return                                                                                                                                                                                          
+        }                                                                                                                                                                                                   
+
+        $folderGuid = [guid]::NewGuid().ToString("B").ToUpper()                                                                                                                                         
+        $itemLines  = ($files | ForEach-Object { "`t`tdocs\Coding-Workflow\$_ = docs\Coding-Workflow\$_" }) -join "`r`n"                                                                                
+                                                                                                                                                                                                            
+        $folderBlock = @(                                                                                                                                                                               
+                "Project(`"{2150E333-8FDC-42A3-9474-1A3956D46DE8}`") = `"Coding-Workflow`", `"Coding-Workflow`", `"$folderGuid`""                                                                           
+                "`tProjectSection(SolutionItems) = preProject"                                                                                                                                              
+                $itemLines                                                                                                                                                                                  
+                "`tEndProjectSection"                                                                                                                                                                       
+                "EndProject"                                                                                                                                                                                
+            ) -join "`r`n"                                                                                                                                                                                  
+                                                                                                                                                                                                            
+        $regex = [regex]::new('(?m)^Global\r?$')                                                                                                                                                        
+            if ($regex.IsMatch($content)) {                                                                                                                                                                 
+                $updated = $regex.Replace($content, "$folderBlock`r`nGlobal", 1)                                                                                                                            
+                [System.IO.File]::WriteAllText($slnPath, $updated, (New-Object System.Text.UTF8Encoding($true)))                                                                                            
+                Write-Host "Added Coding-Workflow folder to: $($slnFiles[0].Name)" -ForegroundColor Green                                                                                                   
+            }                                                                                                                                                                                               
+        }   
+
+     
