@@ -45,5 +45,37 @@ Only the 4 workflow files are downloaded into `./docs/Coding-Workflow/` (`docs` 
    - **Small:** 1 file, no logic/DB/caller impact -> targeted syntax guidance (`A–D`).
    - **Medium:** 2–4 files or logic/query changes -> short impact note + syntax guidance (`A–D`).
    - **Large:** 5+ files, shared code, schema changes, or new modules -> phased workflow in `LARGE-CHANGES.md`.
-4. Say **`draft mode`** to opt in to full code drafts for a single task (still reviewed and applied manually).
-5. Say **`handoff`** to generate a structured summary for `HANDOFF.md` before ending a session.
+4. Use **Default Mode** (automatic), **`draft mode`** (opt-in per task), and **`handoff`** (between sessions) as described below.
+
+## How Modes & Handoff Work
+
+### Default Mode (Normal — Always On)
+
+By default, `AGENTS.md` enforces **Manual Implementation Control**:
+- **Syntax guidance only:** The AI provides minimal code fragments, signatures, templates, and line-level `old -> new` snippets — never full functions, classes, or complete copy-pasteable production files.
+- **No direct source edits:** You write and apply every code change yourself. The only file the AI is allowed to edit directly is `PROJECT-MAP.md` (unless you explicitly instruct otherwise).
+- **Mandatory `A–D` format:** Every proposed change includes **A** (What to change), **B** (Where), **C** (Exact minimal syntax reference), and **D** (Step-by-step manual instructions), ending with `"Confirm if this syntax is correct before applying changes."`
+- **Best for:** Existing or legacy codebases, bug fixes, risky logic, and staying in full control of every line you commit.
+
+### Draft Mode (Opt-In, One Task Only)
+
+Say **`draft mode`** when you want complete code output for a specific task:
+- **What changes:** The fragment-only limit is lifted for **that task only** — the AI can output full functions, classes, boilerplate, or unit tests in chat.
+- **What stays the same:** Analysis, task sizing (`Small`/`Medium`/`Large`), risk floor, security rules, warnings, and the confirmation line all still apply. The AI **still does not edit your source files directly**; the output is a draft for you to review and apply.
+- **Auto-reset:** Draft Mode ends automatically when the task finishes and reverts to Default Mode on the next task.
+- **Best for:** Repetitive boilerplate, test suites, scaffolds, or new standalone scripts.
+
+| Behavior | Default Mode | Draft Mode |
+| --- | --- | --- |
+| Activation | Automatic | Say `draft mode` |
+| Duration | Every task | Single task only (auto-resets) |
+| Code output | Minimal fragments & `old -> new` snippets | Full functions, classes, boilerplate, tests |
+| AI edits source files? | No | No (review & apply manually) |
+| Sizing, risk floor & security rules | Enforced | Enforced |
+
+### Handoff (`HANDOFF.md`)
+
+Say **`handoff`** before ending a session or starting a fresh chat context:
+1. **Generating the handoff:** The AI summarizes the **whole session** (facts and decisions only — no code) into the structured template (`Done`, `Still to do`, `Lacking`, `Agendas not hit`, `User decisions`, `Assumptions`, `Touched / to touch`, `Next step`). It outputs the text without editing files directly so you can copy it into `docs/Coding-Workflow/HANDOFF.md`.
+2. **Resuming in the next session:** The AI reads `PROJECT-MAP.md` first, then `HANDOFF.md` last.
+3. **Verify before trusting:** The next session treats `HANDOFF.md` as a claim, not a guaranteed fact — the AI re-reads the actual code it names before giving syntax and keeps `Lacking` and `Assumptions` open until verified.
