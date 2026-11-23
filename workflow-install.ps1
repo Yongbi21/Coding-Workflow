@@ -86,6 +86,11 @@ param(
             return                                                                                                                                                                                          
         }                                                                                                                                                                                                   
                                                                                                                                                                                                             
+        Write-Host "TIP: Press Ctrl+Shift+S (Save All) in Visual Studio before continuing so unsaved .csproj edits aren't lost." -ForegroundColor Yellow                                                    
+        $null = Read-Host "Press Enter to update $($selectedCsproj.Name)"                                                                                                                                   
+        [xml]$projXml = Get-Content -LiteralPath $selectedCsproj.FullName -Raw 
+                                                                                                                                                                                                         
+                                                                                                                                                                                                            
         $ns    = $projXml.DocumentElement.NamespaceURI                                                                                                                                                      
         $nsMgr = New-Object System.Xml.XmlNamespaceManager($projXml.NameTable)                                                                                                                              
         if ($ns) {                                                                                                                                                                                          
