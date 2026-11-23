@@ -1,4 +1,4 @@
-param(                                                                                                                                                                                                  
+    param(                                                                                                                                                                                                  
         [string]$Repo = "Yongbi21/Coding-Workflow",                                                                                                                                                         
         [string]$Branch = "main",                                                                                                                                                                           
         [switch]$Force                                                                                                                                                                                      
@@ -6,6 +6,66 @@ param(
                                                                                                                                                                                                             
     $ErrorActionPreference = "Stop"                                                                                                                                                                         
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12                                                                                                                         
+                                                                                                                                                                                                            
+    function Select-MenuOption {                                                                                                                                                                            
+        param(                                                                                                                                                                                              
+            [string]$Title,                                                                                                                                                                                 
+            [string[]]$Options                                                                                                                                                                              
+        )                                                                                                                                                                                                   
+                                                                                                                                                                                                            
+        if ([Console]::IsInputRedirected) {                                                                                                                                                                 
+            Write-Host $Title -ForegroundColor Cyan                                                                                                                                                         
+            for ($i = 0; $i -lt $Options.Count; $i++) {                                                                                                                                                     
+                Write-Host "  [$($i + 1)] $($Options[$i])"                                                                                                                                                  
+            }                                                                                                                                                                                               
+            $raw = (Read-Host "Enter number (1-$($Options.Count))").Trim()                                                                                                                                  
+            $num = 0                                                                                                                                                                                        
+            if (-not [int]::TryParse($raw, [ref]$num) -or $num -lt 1 -or $num -gt $Options.Count) {                                                                                                         
+                return -1                                                                                                                                                                                   
+            }                                                                                                                                                                                               
+            return ($num - 1)                                                                                                                                                                               
+        }                                                                                                                                                                                                   
+                                                                                                                                                                                                            
+        $index  = 0                                                                                                                                                                                         
+        $maxLen = ($Options | ForEach-Object { $_.Length } | Measure-Object -Maximum).Maximum                                                                                                               
+                                                                                                                                                                                                            
+        Write-Host "$Title (Up/Down arrows, Enter to select, Esc to cancel)" -ForegroundColor Cyan                                                                                                          
+        for ($i = 0; $i -lt $Options.Count; $i++) {                                                                                                                                                         
+            Write-Host ""                                                                                                                                                                                   
+        }                                                                                                                                                                                                   
+        $startTop = [Math]::Max(0, [Console]::CursorTop - $Options.Count)                                                                                                                                   
+                                                                                                                                                                                                            
+        $prevCursor = [Console]::CursorVisible                                                                                                                                                              
+        [Console]::CursorVisible = $false                                                                                                                                                                   
+        try {                                                                                                                                                                                               
+            while ($true) {                                                                                                                                                                                 
+                for ($i = 0; $i -lt $Options.Count; $i++) {                                                                                                                                                 
+                    [Console]::SetCursorPosition(0, $startTop + $i)                                                                                                                                         
+                    $label = $Options[$i].PadRight($maxLen)                                                                                                                                                 
+                    if ($i -eq $index) {                                                                                                                                                                    
+                        Write-Host "  > $label " -ForegroundColor Black -BackgroundColor Cyan -NoNewline                                                                                                    
+                    }                                                                                                                                                                                       
+                    else {                                                                                                                                                                                  
+                        Write-Host "    $label " -ForegroundColor Gray -NoNewline                                                                                                                           
+                    }                                                                                                                                                                                       
+                }                                                                                                                                                                                           
+                                                                                                                                                                                                            
+                $key = [Console]::ReadKey($true).Key                                                                                                                                                        
+                switch ($key) {                                                                                                                                                                             
+                    "UpArrow"   { $index = ($index - 1 + $Options.Count) % $Options.Count }                                                                                                                 
+                    "DownArrow" { $index = ($index + 1) % $Options.Count }                                                                                                                                  
+                    "Enter"     { return $index }                                                                                                                                                           
+                    "Escape"    { return -1 }                                                                                                                                                               
+                }                                                                                                                                                                                           
+            }                                                                                                                                                                                               
+        }                                                                                                                                                                                                   
+        finally {                                                                                                                                                                                           
+            $endRow = [Math]::Min($startTop + $Options.Count, [Console]::BufferHeight - 1)                                                                                                                  
+            [Console]::SetCursorPosition(0, $endRow)                                                                                                                                                        
+            Write-Host ""                                                                                                                                                                                   
+            [Console]::CursorVisible = $prevCursor                                                                                                                                                          
+        }                                                                                                                                                                                                   
+    }                                                                                                                                                                                                       
                                                                                                                                                                                                             
     $rootDir     = (Get-Location).ProviderPath                                                                                                                                                              
     $excludeDirs = @(".git", ".vs", "bin", "obj", "node_modules", "packages")                                                                                                                               
@@ -21,33 +81,30 @@ param(
     $selectedCsproj = $null                                                                                                                                                                                 
                                                                                                                                                                                                             
     if ($csprojFiles.Count -gt 0) {                                                                                                                                                                         
-        Write-Host "Where should docs\Coding-Workflow be installed?" -ForegroundColor Cyan                                                                                                                  
-        Write-Host "  [1] Solution / Root level (default)"                                                                                                                                                  
-        Write-Host "  [2] Project level (.csproj)"                                                                                                                                                          
-        $choice = (Read-Host "Choose [1/2]").Trim()                                                                                                                                                         
+        $choice = Select-MenuOption -Title "Where should docs\Coding-Workflow be installed?" -Options @(                                                                                                    
+            "Solution / Root level",                                                                                                                                                                        
+            "Project level (.csproj)"                                                                                                                                                                       
+        )                                                                                                                                                                                                   
                                                                                                                                                                                                             
-        if ($choice -eq "2") {                                                                                                                                                                              
+        if ($choice -lt 0) {                                                                                                                                                                                
+            Write-Host "Installation cancelled." -ForegroundColor Yellow                                                                                                                                    
+            return                                                                                                                                                                                          
+        }                                                                                                                                                                                                   
+                                                                                                                                                                                                            
+        if ($choice -eq 1) {                                                                                                                                                                                
             if ($csprojFiles.Count -eq 1) {                                                                                                                                                                 
                 $selectedCsproj = $csprojFiles[0]                                                                                                                                                           
             }                                                                                                                                                                                               
             else {                                                                                                                                                                                          
-                Write-Host "Select target project:" -ForegroundColor Cyan                                                                                                                                   
-                for ($i = 0; $i -lt $csprojFiles.Count; $i++) {                                                                                                                                             
-                    Write-Host "  [$($i + 1)] $($csprojFiles[$i].Name)"                                                                                                                                     
-                }                                                                                                                                                                                           
-                $pickRaw = (Read-Host "Enter number (1-$($csprojFiles.Count))").Trim()                                                                                                                      
-                $pickNum = 0                                                                                                                                                                                
-                if (-not [int]::TryParse($pickRaw, [ref]$pickNum) -or $pickNum -lt 1 -or $pickNum -gt $csprojFiles.Count) {                                                                                 
-                    Write-Error "Invalid project selection '$pickRaw'. Aborting."                                                                                                                           
+                $projNames = @($csprojFiles | ForEach-Object { $_.Name })                                                                                                                                   
+                $pick = Select-MenuOption -Title "Select target project:" -Options $projNames                                                                                                               
+                if ($pick -lt 0) {                                                                                                                                                                          
+                    Write-Host "Installation cancelled." -ForegroundColor Yellow                                                                                                                            
                     return                                                                                                                                                                                  
                 }                                                                                                                                                                                           
-                $selectedCsproj = $csprojFiles[$pickNum - 1]                                                                                                                                                
+                $selectedCsproj = $csprojFiles[$pick]                                                                                                                                                       
             }                                                                                                                                                                                               
             $installBase = $selectedCsproj.DirectoryName                                                                                                                                                    
-        }                                                                                                                                                                                                   
-        elseif ($choice -ne "" -and $choice -ne "1") {                                                                                                                                                      
-            Write-Error "Invalid choice '$choice'. Enter 1 or 2."                                                                                                                                           
-            return                                                                                                                                                                                          
         }                                                                                                                                                                                                   
     }                                                                                                                                                                                                       
                                                                                                                                                                                                             
@@ -86,10 +143,29 @@ param(
             return                                                                                                                                                                                          
         }                                                                                                                                                                                                   
                                                                                                                                                                                                             
-        Write-Host "TIP: Press Ctrl+Shift+S (Save All) in Visual Studio before continuing so unsaved .csproj edits aren't lost." -ForegroundColor Yellow                                                    
-        $null = Read-Host "Press Enter to update $($selectedCsproj.Name)"                                                                                                                                   
-        [xml]$projXml = Get-Content -LiteralPath $selectedCsproj.FullName -Raw 
-                                                                                                                                                                                                         
+        if (Get-Process -Name "devenv" -ErrorAction SilentlyContinue) {                                                                                                                                     
+            $autoSaved = $false                                                                                                                                                                             
+            foreach ($progId in @("VisualStudio.DTE.18.0", "VisualStudio.DTE.17.0", "VisualStudio.DTE")) {                                                                                                  
+                try {                                                                                                                                                                                       
+                    $dte = [Runtime.InteropServices.Marshal]::GetActiveObject($progId)                                                                                                                      
+                    if ($dte.Solution.FullName -and ([IO.Path]::GetDirectoryName($dte.Solution.FullName) -ieq $rootDir)) {                                                                                  
+                        $dte.ExecuteCommand("File.SaveAll")                                                                                                                                                 
+                        Start-Sleep -Milliseconds 300                                                                                                                                                       
+                        Write-Host "Auto-saved Visual Studio project before updating $($selectedCsproj.Name)." -ForegroundColor Cyan                                                                        
+                        $autoSaved = $true                                                                                                                                                                  
+                        break                                                                                                                                                                               
+                    }                                                                                                                                                                                       
+                }                                                                                                                                                                                           
+                catch { }                                                                                                                                                                                   
+            }                                                                                                                                                                                               
+                                                                                                                                                                                                            
+            if (-not $autoSaved) {                                                                                                                                                                          
+                Write-Host "Visual Studio is open. Please press Ctrl+Shift+S (Save All) before continuing." -ForegroundColor Yellow                                                                         
+                $null = Read-Host "Press Enter once saved to update $($selectedCsproj.Name)"                                                                                                                
+            }                                                                                                                                                                                               
+                                                                                                                                                                                                            
+            [xml]$projXml = Get-Content -LiteralPath $selectedCsproj.FullName -Raw                                                                                                                          
+        }                                                                                                                                                                                                   
                                                                                                                                                                                                             
         $ns    = $projXml.DocumentElement.NamespaceURI                                                                                                                                                      
         $nsMgr = New-Object System.Xml.XmlNamespaceManager($projXml.NameTable)                                                                                                                              
@@ -191,4 +267,4 @@ param(
                 Write-Host "Added Coding-Workflow folder to: $($slnFiles[0].Name)" -ForegroundColor Green                                                                                                   
             }                                                                                                                                                                                               
         }                                                                                                                                                                                                   
-    }                                                                                                                                                                                                       
+    }      
