@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $targetDir = (Get-Location).ProviderPath
 $baseUrl = "https://raw.githubusercontent.com/$Repo/$Branch"
-$files = @("agents.md", "project-map.md", "large-changes.md", "handoff.md")
+$files = @("AGENTS.MD", "PROJECT-MAP.MD", "LARGE-CHANGES.MD", "HANDOFF.MD")
 
 foreach ($file in $files) {
     $destinationPath = Join-Path $targetDir $file   
