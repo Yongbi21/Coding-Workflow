@@ -1,4 +1,4 @@
-    param(                                                                                                                                                                                                  
+param(                                                                                                                                                                                                  
         [string]$Repo = "Yongbi21/Coding-Workflow",                                                                                                                                                         
         [string]$Branch = "main",                                                                                                                                                                           
         [switch]$Force                                                                                                                                                                                      
@@ -7,7 +7,7 @@
     $ErrorActionPreference = "Stop"                                                                                                                                                                         
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12                                                                                                                         
                                                                                                                                                                                                             
-    $rootDir = (Get-Location).ProviderPath                                                                                                                                                                  
+    $rootDir     = (Get-Location).ProviderPath                                                                                                                                                              
     $excludeDirs = @(".git", ".vs", "bin", "obj", "node_modules", "packages")                                                                                                                               
                                                                                                                                                                                                             
     $csprojFiles = @(                                                                                                                                                                                       
@@ -51,7 +51,11 @@
         }                                                                                                                                                                                                   
     }                                                                                                                                                                                                       
                                                                                                                                                                                                             
-    $docsDir   = Join-Path $installBase "docs"                                                                                                                                                              
+    $existingDocs = Get-ChildItem -LiteralPath $installBase -Directory -ErrorAction SilentlyContinue |                                                                                                      
+        Where-Object { $_.Name -ieq "docs" } |                                                                                                                                                              
+        Select-Object -First 1                                                                                                                                                                              
+    $docsName  = if ($existingDocs) { $existingDocs.Name } else { "docs" }                                                                                                                                  
+    $docsDir   = Join-Path $installBase $docsName                                                                                                                                                           
     $targetDir = Join-Path $docsDir "Coding-Workflow"                                                                                                                                                       
                                                                                                                                                                                                             
     if (-not (Test-Path -LiteralPath $targetDir)) {                                                                                                                                                         
@@ -78,7 +82,7 @@
         [xml]$projXml = Get-Content -LiteralPath $selectedCsproj.FullName -Raw                                                                                                                              
                                                                                                                                                                                                             
         if ($projXml.DocumentElement.HasAttribute("Sdk")) {                                                                                                                                                 
-            Write-Host "SDK-style project detected ($($selectedCsproj.Name)); docs\Coding-Workflow appears automatically." -ForegroundColor Cyan                                                            
+            Write-Host "SDK-style project detected ($($selectedCsproj.Name)); $docsName\Coding-Workflow appears automatically." -ForegroundColor Cyan                                                       
             return                                                                                                                                                                                          
         }                                                                                                                                                                                                   
                                                                                                                                                                                                             
@@ -88,17 +92,19 @@
             $nsMgr.AddNamespace("ms", $ns)                                                                                                                                                                  
         }                                                                                                                                                                                                   
                                                                                                                                                                                                             
+        $existingItems = if ($ns) {                                                                                                                                                                         
+            @($projXml.SelectNodes("//ms:None | //ms:Content", $nsMgr))                                                                                                                                     
+        }                                                                                                                                                                                                   
+        else {                                                                                                                                                                                              
+            @($projXml.SelectNodes("//None | //Content"))                                                                                                                                                   
+        }                                                                                                                                                                                                   
+                                                                                                                                                                                                            
         $group = if ($ns) { $projXml.CreateElement("ItemGroup", $ns) } else { $projXml.CreateElement("ItemGroup") }                                                                                         
         $added = 0                                                                                                                                                                                          
                                                                                                                                                                                                             
         foreach ($file in $files) {                                                                                                                                                                         
-            $rel = "docs\Coding-Workflow\$file"                                                                                                                                                             
-            $exists = if ($ns) {                                                                                                                                                                            
-                $projXml.SelectSingleNode("//ms:None[@Include='$rel'] | //ms:Content[@Include='$rel']", $nsMgr)                                                                                             
-            }                                                                                                                                                                                               
-            else {                                                                                                                                                                                          
-                $projXml.SelectSingleNode("//None[@Include='$rel'] | //Content[@Include='$rel']")                                                                                                           
-            }                                                                                                                                                                                               
+            $rel    = "$docsName\Coding-Workflow\$file"                                                                                                                                                     
+            $exists = $existingItems | Where-Object { $_.Include -ieq $rel }                                                                                                                                
                                                                                                                                                                                                             
             if (-not $exists) {                                                                                                                                                                             
                 $node = if ($ns) { $projXml.CreateElement("None", $ns) } else { $projXml.CreateElement("None") }                                                                                            
@@ -122,19 +128,21 @@
         $slnFiles  = @(Get-ChildItem -LiteralPath $rootDir -Filter "*.sln" -File)                                                                                                                           
                                                                                                                                                                                                             
         if ($slnxFiles.Count -eq 1) {                                                                                                                                                                       
-            $slnxPath = $slnxFiles[0].FullName                                                                                                                                                              
-            [xml]$xml = Get-Content -LiteralPath $slnxPath -Raw                                                                                                                                             
+            $slnxPath   = $slnxFiles[0].FullName                                                                                                                                                            
+            $slnxFolder = "/$docsName/Coding-Workflow/"                                                                                                                                                     
+            [xml]$xml   = Get-Content -LiteralPath $slnxPath -Raw                                                                                                                                           
                                                                                                                                                                                                             
-            if ($xml.SelectSingleNode("/Solution/Folder[@Name='/docs/Coding-Workflow/']")) {                                                                                                                
-                Write-Host "Skipped .slnx update (already contains /docs/Coding-Workflow/)." -ForegroundColor Yellow                                                                                        
+            $existingFolder = @($xml.SelectNodes("/Solution/Folder")) | Where-Object { $_.Name -ieq $slnxFolder }                                                                                           
+            if ($existingFolder) {                                                                                                                                                                          
+                Write-Host "Skipped .slnx update (already contains $slnxFolder)." -ForegroundColor Yellow                                                                                                   
                 return                                                                                                                                                                                      
             }                                                                                                                                                                                               
                                                                                                                                                                                                             
             $folder = $xml.CreateElement("Folder")                                                                                                                                                          
-            $folder.SetAttribute("Name", "/docs/Coding-Workflow/")                                                                                                                                          
+            $folder.SetAttribute("Name", $slnxFolder)                                                                                                                                                       
             foreach ($file in $files) {                                                                                                                                                                     
                 $fileNode = $xml.CreateElement("File")                                                                                                                                                      
-                $fileNode.SetAttribute("Path", "docs/Coding-Workflow/$file")                                                                                                                                
+                $fileNode.SetAttribute("Path", "$docsName/Coding-Workflow/$file")                                                                                                                           
                 $folder.AppendChild($fileNode) | Out-Null                                                                                                                                                   
             }                                                                                                                                                                                               
             $xml.Solution.AppendChild($folder) | Out-Null                                                                                                                                                   
@@ -150,7 +158,7 @@
                 $writer.Dispose()                                                                                                                                                                           
             }                                                                                                                                                                                               
                                                                                                                                                                                                             
-            Write-Host "Added /docs/Coding-Workflow/ folder to: $($slnxFiles[0].Name)" -ForegroundColor Green                                                                                               
+            Write-Host "Added $slnxFolder folder to: $($slnxFiles[0].Name)" -ForegroundColor Green                                                                                                          
         }                                                                                                                                                                                                   
         elseif ($slnFiles.Count -eq 1) {                                                                                                                                                                    
             $slnPath = $slnFiles[0].FullName                                                                                                                                                                
@@ -162,7 +170,7 @@
             }                                                                                                                                                                                               
                                                                                                                                                                                                             
             $folderGuid  = [guid]::NewGuid().ToString("B").ToUpper()                                                                                                                                        
-            $itemLines   = ($files | ForEach-Object { "`t`tdocs\Coding-Workflow\$_ = docs\Coding-Workflow\$_" }) -join "`r`n"                                                                               
+            $itemLines   = ($files | ForEach-Object { "`t`t$docsName\Coding-Workflow\$_ = $docsName\Coding-Workflow\$_" }) -join "`r`n"                                                                     
             $folderBlock = @(                                                                                                                                                                               
                 "Project(`"{2150E333-8FDC-42A3-9474-1A3956D46DE8}`") = `"Coding-Workflow`", `"Coding-Workflow`", `"$folderGuid`""                                                                           
                 "`tProjectSection(SolutionItems) = preProject"                                                                                                                                              
