@@ -1,4 +1,4 @@
-# PROJECT_MAP.md
+# PROJECT_MAP.MD
 
 Status: NOT INITIALIZED
 Last updated: never

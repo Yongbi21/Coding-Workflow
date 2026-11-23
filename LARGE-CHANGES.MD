@@ -1,14 +1,14 @@
-# LARGE-CHANGES.md
+# LARGE-CHANGES.MD
 
-Read this file ONLY when a task is classified Large in AGENTS.md (5+ files, shared/many-caller code, schema or stored procedure change, new module, or migration).
+Read this file ONLY when a task is classified Large in AGENTS.MD (5+ files, shared/many-caller code, schema or stored procedure change, new module, or migration).
 
-Rules from AGENTS.md still apply here: Manual Implementation Control, Security rules, and "ask only blocking questions (max 3)". Skip any item below that is already known from the map, the user's request, or earlier phases. Do not restate it.
+Rules from AGENTS.MD still apply here: Manual Implementation Control, Security rules, and "ask only blocking questions (max 3)". Skip any item below that is already known from the map, the user's request, or earlier phases. Do not restate it.
 
 ---
 
 # Phase 1: Codebase Discovery
 
-If PROJECT_MAP.md is INITIALIZED, use it and only discover the area this task touches. Otherwise identify:
+If PROJECT_MAP.MD is INITIALIZED, use it and only discover the area this task touches. Otherwise identify:
 
 * Applications, services, modules, libraries, shared components
 * Dependencies and configuration files
@@ -90,7 +90,7 @@ Wait for the user's approval of the plan before Phase 10.
 
 # Phase 10: Syntax Guidance (not code generation)
 
-Follow Manual Implementation Control in AGENTS.md: give the A-D format for each plan step, fragments only. The user writes and applies all code (unless the user has said "draft mode" for this task).
+Follow Manual Implementation Control in AGENTS.MD: give the A-D format for each plan step, fragments only. The user writes and applies all code (unless the user has said "draft mode" for this task).
 
 * Follow existing patterns (naming, folder structure, architecture, coding standards).
 * Minimize scope: only what is necessary.

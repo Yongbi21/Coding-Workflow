@@ -1,4 +1,4 @@
-# AGENTS.md
+# AGENTS.MD
 
 ## Purpose
 
@@ -9,9 +9,9 @@ Understand the current system before proposing changes. Do not assume requiremen
 Order of work: analyze, clarify only what blocks you, design, then give syntax guidance.
 
 Related files:
-* PROJECT_MAP.md: stable facts about the codebase (read every session).
-* LARGE-CHANGES.md: the full phased workflow. Read it ONLY for tasks classified Large.
-* HANDOFF.md: current task state from the previous session. Read last, after PROJECT_MAP.md, if it exists and is not empty.
+* PROJECT_MAP.MD: stable facts about the codebase (read every session).
+* LARGE-CHANGES.MD: the full phased workflow. Read it ONLY for tasks classified Large.
+* HANDOFF.MD: current task state from the previous session. Read last, after PROJECT_MAP.MD, if it exists and is not empty.
 
 Efficiency Rules (below) override the phased workflow for Small and Medium tasks.
 
@@ -115,7 +115,7 @@ Classify by the HIGHEST level any criterion hits, and state it in one line.
 * Medium: 2-4 files, or a few callers, or a query/logic change.
   -> Impact note (max 5 lines), then A-D.
 * Large: 5+ files, shared/many-caller code, schema or stored procedure change, new module, or migration.
-  -> Read LARGE-CHANGES.md and run the phases it defines.
+  -> Read LARGE-CHANGES.MD and run the phases it defines.
 * Risk floor: anything in the map's "High-risk areas" section, or any code involving money/financial calculations, authentication or permissions, personal data, shared code with many callers, data migrations, or irreversible/destructive operations, is at least Medium.
 * To find callers, grep for the symbol (and for DB objects, grep the SQL text too). Do not guess.
 * For bugs, features, optimizations, tests, edge cases, and data fixes, investigate first and classify after (see section 2).
@@ -198,7 +198,7 @@ Classify by the HIGHEST level any criterion hits, and state it in one line.
 * When the user says "handoff", output the session state using the template below.
   Pull from the whole session, not just the last turn. Write "none" for empty
   fields. Facts and decisions only, no code. Do not write any file.
-* If HANDOFF.md exists at session start, treat it as a claim, not a fact:
+* If HANDOFF.MD exists at session start, treat it as a claim, not a fact:
   re-read the code it names before giving syntax, and treat Lacking and
   Assumptions as open.
 ### 6A. Template
@@ -233,7 +233,7 @@ Current phase/step: <...>
 # Project Map Rules
 
 ## Using the map
-* At the start of every session, read PROJECT_MAP.md.
+* At the start of every session, read PROJECT_MAP.MD.
 * If Status is NOT INITIALIZED: run discovery once (project structure, architecture, technology stack, and the entry points and dependencies of the main modules), fill every section, set Status to INITIALIZED, set Last updated to today, and set "Checked up to" (see Change detection).
 * If INITIALIZED: skip discovery. Use the map.
 * The map is a guide, never the final source. Re-read the real code before suggesting changes.
@@ -258,4 +258,4 @@ Current phase/step: <...>
 * If the user says something was changed by someone else, re-check that area and update the map.
 
 ## Permissions
-* EXCEPTION to Manual Implementation Control: the agent may edit PROJECT_MAP.md directly. It may not edit any source code.
+* EXCEPTION to Manual Implementation Control: the agent may edit PROJECT_MAP.MD directly. It may not edit any source code.
