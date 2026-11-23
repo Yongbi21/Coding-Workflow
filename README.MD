@@ -21,7 +21,8 @@ Open a terminal, `cd` into your target project's root directory, and run:
 irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1 | iex 
 ```
 
-To overwrite existing workflow files (warning: this replaces `PROJECT_MAP.md` and `HANDOFF.md` if present):
+To overwrite existing workflow files (warning: this replaces `PROJECT-
+MAP.md` and `HANDOFF.md` if present):
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1))) -Force
@@ -31,7 +32,7 @@ To overwrite existing workflow files (warning: this replaces `PROJECT_MAP.md` an
 
 Only the 4 workflow files are downloaded into your current working directory:
 - `AGENTS.md`
-- `PROJECT_MAP.md`
+- `PROJECT-MAP.md`
 - `LARGE-CHANGES.md`
 - `HANDOFF.md`
 
@@ -40,7 +41,7 @@ Only the 4 workflow files are downloaded into your current working directory:
 ## Usage in a Target Project
 
 1. Configure your AI coding assistant to load `AGENTS.md` as project rules.
-2. On the first session, the agent runs discovery once and populates `PROJECT_MAP.md` (`Status: INITIALIZED`).
+2. On the first session, the agent runs discovery once and populates `PROJECT-MAP.md` (`Status: INITIALIZED`).
 3. Tasks are scaled automatically:
    - **Small:** 1 file, no logic/DB/caller impact -> targeted syntax guidance (`A–D`).
    - **Medium:** 2–4 files or logic/query changes -> short impact note + syntax guidance (`A–D`).
