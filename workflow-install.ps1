@@ -7,9 +7,15 @@ param(
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$targetDir = (Get-Location).ProviderPath
+$docsDir = Join-Path (Get-Location).ProviderPath "docs"
+$targetDir = Join-Path $docsDir "Coding-Workflow"
+
+if (-not (Test-Path -LiteralPath $targetDir)) {
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+}
+
 $baseUrl = "https://raw.githubusercontent.com/$Repo/$Branch"
-$files = @("AGENTS.MD", "PROJECT-MAP.MD", "LARGE-CHANGES.MD", "HANDOFF.MD")
+$files = @("AGENTS.md", "PROJECT-MAP.md", "LARGE-CHANGES.md", "HANDOFF.md")
 
 foreach ($file in $files) {
     $destinationPath = Join-Path $targetDir $file   

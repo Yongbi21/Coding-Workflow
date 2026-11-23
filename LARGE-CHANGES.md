@@ -8,7 +8,7 @@ Rules from AGENTS.md still apply here: Manual Implementation Control, Security r
 
 # Phase 1: Codebase Discovery
 
-If PROJECT_MAP.md is INITIALIZED, use it and only discover the area this task touches. Otherwise identify:
+If PROJECT-MAP.md is INITIALIZED, use it and only discover the area this task touches. Otherwise identify:
 
 * Applications, services, modules, libraries, shared components
 * Dependencies and configuration files

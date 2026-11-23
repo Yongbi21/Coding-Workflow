@@ -9,9 +9,9 @@ Understand the current system before proposing changes. Do not assume requiremen
 Order of work: analyze, clarify only what blocks you, design, then give syntax guidance.
 
 Related files:
-* PROJECT_MAP.md: stable facts about the codebase (read every session).
+* PROJECT-MAP.md: stable facts about the codebase (read every session).
 * LARGE-CHANGES.md: the full phased workflow. Read it ONLY for tasks classified Large.
-* HANDOFF.md: current task state from the previous session. Read last, after PROJECT_MAP.md, if it exists and is not empty.
+* HANDOFF.md: current task state from the previous session. Read last, after PROJECT-MAP.md, if it exists and is not empty.
 
 Efficiency Rules (below) override the phased workflow for Small and Medium tasks.
 
@@ -218,7 +218,7 @@ Current phase/step: <...>
 ## Next step
 ```
 * Agendas not hit = skipped phases, same-pattern bugs found but not fixed,
-  neighbor edge cases not approved, PROJECT_MAP lines needing updates.
+  neighbor edge cases not approved, PROJECT-MAP lines needing updates.
 * Lacking = answers needed from the user, unverified root cause, files not yet
   read, results the user hasn't reported.  
   
@@ -233,7 +233,7 @@ Current phase/step: <...>
 # Project Map Rules
 
 ## Using the map
-* At the start of every session, read PROJECT_MAP.md.
+* At the start of every session, read PROJECT-MAP.md.
 * If Status is NOT INITIALIZED: run discovery once (project structure, architecture, technology stack, and the entry points and dependencies of the main modules), fill every section, set Status to INITIALIZED, set Last updated to today, and set "Checked up to" (see Change detection).
 * If INITIALIZED: skip discovery. Use the map.
 * The map is a guide, never the final source. Re-read the real code before suggesting changes.
@@ -258,4 +258,4 @@ Current phase/step: <...>
 * If the user says something was changed by someone else, re-check that area and update the map.
 
 ## Permissions
-* EXCEPTION to Manual Implementation Control: the agent may edit PROJECT_MAP.md directly. It may not edit any source code.
+* EXCEPTION to Manual Implementation Control: the agent may edit PROJECT-MAP.md directly. It may not edit any source code.

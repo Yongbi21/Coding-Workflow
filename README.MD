@@ -7,10 +7,10 @@ Reusable AI software engineering workflow rules and templates designed for worki
 | File | Purpose |
 | --- | --- |
 | `AGENTS.md` | Core engineering principles, Manual Implementation Control, efficiency sizing (`Small` / `Medium` / `Large`), security rules, and project map rules. |
-| `PROJECT_MAP.md` | Blank project map template (`Status: NOT INITIALIZED`) populated once per target repo with stable codebase facts. |
+| `PROJECT-MAP.md` | Blank project map template (`Status: NOT INITIALIZED`) populated once per target repo with stable codebase facts. |
 | `LARGE-CHANGES.md` | Full phased analysis workflow used only for tasks classified as `Large`. |
 | `HANDOFF.md` | Session handoff template for carrying task state across sessions. |
-| `workflow-install.ps1` | PowerShell installer script that downloads the 4 workflow files into your current project root. |
+| `workflow-install.ps1` | PowerShell installer script that downloads the 4 workflow files into `./docs/Coding-Workflow/` in your project root. |
 
 ## Quick Install (PowerShell)
 
@@ -21,8 +21,7 @@ Open a terminal, `cd` into your target project's root directory, and run:
 irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1 | iex 
 ```
 
-To overwrite existing workflow files (warning: this replaces `PROJECT-
-MAP.md` and `HANDOFF.md` if present):
+To overwrite existing workflow files (warning: this replaces `PROJECT-MAP.md` and `HANDOFF.md` if present):
 
 ```powershell
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1))) -Force
@@ -30,18 +29,18 @@ MAP.md` and `HANDOFF.md` if present):
 
 ### What Gets Installed
 
-Only the 4 workflow files are downloaded into your current working directory:
+Only the 4 workflow files are downloaded into `./docs/Coding-Workflow/` (`docs` is created automatically if missing; existing files inside `docs` are untouched):
 - `AGENTS.md`
 - `PROJECT-MAP.md`
 - `LARGE-CHANGES.md`
 - `HANDOFF.md`
 
-`README.MD` and `workflow-install.ps1` are intentionally excluded.
+`README.md` and `workflow-install.ps1` are intentionally excluded.
 
 ## Usage in a Target Project
 
-1. Configure your AI coding assistant to load `AGENTS.md` as project rules.
-2. On the first session, the agent runs discovery once and populates `PROJECT-MAP.md` (`Status: INITIALIZED`).
+1. Configure your AI coding assistant to load `docs/Coding-Workflow/AGENTS.md` as project rules.
+2. On the first session, the agent runs discovery once and populates `docs/Coding-Workflow/PROJECT-MAP.md` (`Status: INITIALIZED`).
 3. Tasks are scaled automatically:
    - **Small:** 1 file, no logic/DB/caller impact -> targeted syntax guidance (`A–D`).
    - **Medium:** 2–4 files or logic/query changes -> short impact note + syntax guidance (`A–D`).
