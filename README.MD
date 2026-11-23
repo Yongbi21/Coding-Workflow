@@ -18,16 +18,14 @@ Open a terminal, `cd` into your target project's root directory, and run:
 
 ```powershell
 # Default: downloads workflow files and skips any that already exist
-irm https://raw.githubusercontent.com/<OWNER>/<REPO>/main/workflow-install.ps1 | iex
+irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1 | iex 
 ```
 
 To overwrite existing workflow files (warning: this replaces `PROJECT_MAP.md` and `HANDOFF.md` if present):
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/<OWNER>/<REPO>/main/workflow-install.ps1))) -Force
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Yongbi21/Coding-Workflow/main/workflow-install.ps1))) -Force
 ```
-
-> **Note:** Replace `<OWNER>/<REPO>` above (and in `workflow-install.ps1`) with your GitHub username and repository name after pushing this repo.
 
 ### What Gets Installed
 
